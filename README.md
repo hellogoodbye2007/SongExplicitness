@@ -1,5 +1,8 @@
-# SongExplicitness
-Analyzing song explicitness as it relates to mathematical representations of musical fetaures. Made as final project for DSC80.
+# The Musical Meaning of Explicitness
+
+**By Abhinav Krishna**
+
+---
 
 ## Introduction
  
@@ -14,7 +17,7 @@ This matters because it gets at something intuitive but rarely tested rigorously
 lyrics *sound* different, or is explicitness purely a lyrical/content label independent of the
 music itself?
  
-The dataset contains **`<FILL IN: number of rows after cleaning>`** tracks. The columns most
+The dataset contains 89740 tracks. The columns most
 relevant to this analysis are:
  
 | Column | Description |
