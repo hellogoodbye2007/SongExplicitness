@@ -57,7 +57,8 @@ true "zero" measurement.
  
 Cleaned data preview:
 
-<div style="overflow-x: auto;">
+<div style="overflow-x: auto;" markdown = "1">
+
 | track_id               | artists                | album_name                                             | track_name                 |   popularity |   duration_ms | release_date   | explicit   |   danceability |   energy |   key |   loudness |   mode |   speechiness |   acousticness |   instrumentalness |   liveness |   valence |   tempo |   time_signature | track_genre   |   duration_min |
 |:-----------------------|:-----------------------|:-------------------------------------------------------|:---------------------------|-------------:|--------------:|:---------------|:-----------|---------------:|---------:|------:|-----------:|-------:|--------------:|---------------:|-------------------:|-----------:|----------:|--------:|-----------------:|:--------------|---------------:|
 | 5SuOikwiRyPMVoIQDJUgSV | Gen Hoshino            | Comedy                                                 | Comedy                     |           73 |        230666 | 1974           | False      |          0.676 |   0.461  |     1 |     -6.746 |      0 |        0.143  |         0.0322 |           1.01e-06 |     0.358  |     0.715 |  87.917 |                4 | acoustic      |        3.84443 |
@@ -65,6 +66,7 @@ Cleaned data preview:
 | 1iJBSr7s7jYXzM8EGcbK5b | Ingrid Michaelson;ZAYN | To Begin Again                                         | To Begin Again             |           57 |        210826 | 1973           | False      |          0.438 |   0.359  |     0 |     -9.734 |      1 |        0.0557 |         0.21   |           0        |     0.117  |     0.12  |  76.332 |                4 | acoustic      |        3.51377 |
 | 6lfxq3CG4xtTiEg7opyCyx | Kina Grannis           | Crazy Rich Asians (Original Motion Picture Soundtrack) | Can't Help Falling In Love |           71 |        201933 | 2018-08-10     | False      |          0.266 |   0.0596 |     0 |    -18.515 |      1 |        0.0363 |         0.905  |           7.07e-05 |     0.132  |     0.143 | 181.74  |                3 | acoustic      |        3.36555 |
 | 5vjLSffimiIP26QG5WcN2K | Chord Overstreet       | Hold On                                                | Hold On                    |           82 |        198853 | 2017-02-03     | False      |          0.618 |   0.443  |     2 |     -9.681 |      1 |        0.0526 |         0.469  |           0        |     0.0829 |     0.167 | nan     |                4 | acoustic      |        3.31422 |
+
 </div> 
 
 ### Univariate Analysis
@@ -99,11 +101,13 @@ last bin, we find that 4 out of the 5 are metal subgenres, which would explain t
  
 Grouping numeric features by `explicit` status:
 
-<div style="overflow-x: auto;">
+<div style="overflow-x: auto;" markdown = "1">
+
 |   popularity |   duration_ms |   danceability |   energy |   loudness |     mode |   speechiness |   acousticness |   instrumentalness |   liveness |   valence |   tempo |
 |-------------:|--------------:|---------------:|---------:|-----------:|---------:|--------------:|---------------:|-------------------:|-----------:|----------:|--------:|
 |      32.8526 |        231407 |       0.555717 | 0.62654  |   -8.67348 | 0.641962 |     0.0760494 |       0.337772 |          0.184538  |   0.214503 |  0.469693 | 123.36  |
 |      36.8856 |        205050 |       0.630846 | 0.718776 |   -6.64095 | 0.583853 |     0.20876   |       0.22726  |          0.0549742 |   0.243254 |  0.46715  | 122.047 |
+
 </div>
  
 Explicit tracks average higher energy, danceability, and speechiness, and lower acousticness and
@@ -146,6 +150,7 @@ We see the results of the hypothesis test below:
   height="600"
   frameborder="0"
 ></iframe>
+
 ---
  
 ## Hypothesis Testing
@@ -189,6 +194,7 @@ explicit in the first place, rather than a universal property of "explicit music
 - **Evaluation metric:**: Accuracy, mainly chose for ease of interpretability; however, it comes with
   the cost that accuracy will seem high even for a poor model(a model that predicts non-explicit every time
   would score fairly high), so have to take this into account when analyzing results.
+  
 ---
  
 ## Baseline Model
@@ -244,9 +250,11 @@ the number of estimators controls how stable the ensemble's averaged predictions
 
 Below we see a matrix describing the performance of the final model:
 ![Confusion Matrix](assets/confusionmatrix.png)
+
 The low recall and high precision for explicit tracks implies this model is essentially a more refined 
 version of the "guess not explicit every time model", in the sense that it rarely predicts a track to 
 be explicit, but does so when it feels extremely confident.
+
 ---
  
 ## Fairness Analysis
