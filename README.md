@@ -118,8 +118,8 @@ produced, vocal-forward, higher-intensity music.
  
 ## Assessment of Missingness
 
-Analyzing missigness, we find only tempo and time signature to be missing values, with around
-19.8% percent of the tracks missing tempo and 0.181% of the tracks missing time signature.
+Analyzing missingness, we find only tempo and time signature to be missing values, with around
+19.8% of the tracks missing tempo and 0.181% of the tracks missing time signature.
 
 ### MNAR Analysis
  
@@ -142,7 +142,7 @@ Total Variation Distance (TVD) as the test statistic for categorical columns.
 I ran the same pair of tests for `time_signature` missingness:
  
 - **Depends on `track_genre`**: observed TVD ≈ 0.46, p-value = 0.0. For likely the same reasons as above.
-- **Does not depend on `mode`**: p-value = 0.207. No reason for a major or minor key to influence missigness of time signature.
+- **Does not depend on `mode`**: p-value = 0.207. No reason for a major or minor key to influence missingness of time signature.
 We see the results of the hypothesis test below:
 <iframe
   src="assets/missingpermtest.html"
@@ -187,11 +187,11 @@ explicit in the first place, rather than a universal property of "explicit music
 - **Type:** Classification (binary — explicit vs. not explicit)
 - **Response variable:** `explicit`. I chose this because it's the central question motivating the
   whole project: whether explicitness is reflected in a track's sound.
-- **Features used are all knowable at "time of prediction"**: all are Spotify's own
+- **Features used are all knowable at "time of prediction":** all are Spotify's own
   algorithmically-derived audio features, generated from the track's audio at ingestion — none of
   them depend on post-release information like `popularity`, so there's no risk of leaking
   future/outcome information into the model.
-- **Evaluation metric:**: Accuracy, mainly chose for ease of interpretability; however, it comes with
+- **Evaluation metric:** Accuracy, mainly chose for ease of interpretability; however, it comes with
   the cost that accuracy will seem high even for a poor model(a model that predicts non-explicit every time
   would score fairly high), so have to take this into account when analyzing results.
   
