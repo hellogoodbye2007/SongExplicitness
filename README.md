@@ -56,8 +56,8 @@ estimates these values, and each sentinel marks a case where that estimation fai
 true "zero" measurement.
  
 Cleaned data preview:
- 
-```
+
+<div style="overflow-x: auto;">
 | track_id               | artists                | album_name                                             | track_name                 |   popularity |   duration_ms | release_date   | explicit   |   danceability |   energy |   key |   loudness |   mode |   speechiness |   acousticness |   instrumentalness |   liveness |   valence |   tempo |   time_signature | track_genre   |   duration_min |
 |:-----------------------|:-----------------------|:-------------------------------------------------------|:---------------------------|-------------:|--------------:|:---------------|:-----------|---------------:|---------:|------:|-----------:|-------:|--------------:|---------------:|-------------------:|-----------:|----------:|--------:|-----------------:|:--------------|---------------:|
 | 5SuOikwiRyPMVoIQDJUgSV | Gen Hoshino            | Comedy                                                 | Comedy                     |           73 |        230666 | 1974           | False      |          0.676 |   0.461  |     1 |     -6.746 |      0 |        0.143  |         0.0322 |           1.01e-06 |     0.358  |     0.715 |  87.917 |                4 | acoustic      |        3.84443 |
@@ -65,8 +65,8 @@ Cleaned data preview:
 | 1iJBSr7s7jYXzM8EGcbK5b | Ingrid Michaelson;ZAYN | To Begin Again                                         | To Begin Again             |           57 |        210826 | 1973           | False      |          0.438 |   0.359  |     0 |     -9.734 |      1 |        0.0557 |         0.21   |           0        |     0.117  |     0.12  |  76.332 |                4 | acoustic      |        3.51377 |
 | 6lfxq3CG4xtTiEg7opyCyx | Kina Grannis           | Crazy Rich Asians (Original Motion Picture Soundtrack) | Can't Help Falling In Love |           71 |        201933 | 2018-08-10     | False      |          0.266 |   0.0596 |     0 |    -18.515 |      1 |        0.0363 |         0.905  |           7.07e-05 |     0.132  |     0.143 | 181.74  |                3 | acoustic      |        3.36555 |
 | 5vjLSffimiIP26QG5WcN2K | Chord Overstreet       | Hold On                                                | Hold On                    |           82 |        198853 | 2017-02-03     | False      |          0.618 |   0.443  |     2 |     -9.681 |      1 |        0.0526 |         0.469  |           0        |     0.0829 |     0.167 | nan     |                4 | acoustic      |        3.31422 |
-```
- 
+</div> 
+
 ### Univariate Analysis
  
 <iframe
@@ -98,13 +98,13 @@ last bin, we find that 4 out of the 5 are metal subgenres, which would explain t
 ### Interesting Aggregates
  
 Grouping numeric features by `explicit` status:
- 
-```
+
+<div style="overflow-x: auto;">
 |   popularity |   duration_ms |   danceability |   energy |   loudness |     mode |   speechiness |   acousticness |   instrumentalness |   liveness |   valence |   tempo |
 |-------------:|--------------:|---------------:|---------:|-----------:|---------:|--------------:|---------------:|-------------------:|-----------:|----------:|--------:|
 |      32.8526 |        231407 |       0.555717 | 0.62654  |   -8.67348 | 0.641962 |     0.0760494 |       0.337772 |          0.184538  |   0.214503 |  0.469693 | 123.36  |
 |      36.8856 |        205050 |       0.630846 | 0.718776 |   -6.64095 | 0.583853 |     0.20876   |       0.22726  |          0.0549742 |   0.243254 |  0.46715  | 122.047 |
-```
+</div>
  
 Explicit tracks average higher energy, danceability, and speechiness, and lower acousticness and
 instrumentalness than non-explicit tracks, consistent with explicit content skewing toward more
@@ -120,7 +120,7 @@ Analyzing missigness, we find only tempo and time signature to be missing values
 ### MNAR Analysis
  
 I believe neither of these to be MNAR. The missingness is likely attributed to ambient noise and
-fluctuations in tempo that make it tough for Spoitfy to algorithmically compute this values,
+fluctuations in tempo that make it tough for Spotify to algorithmically compute this values,
 which don't necessarily change with respect to the values of tempo or time signature themselves; rather,
 they would change with other features like genre.
  
@@ -156,7 +156,7 @@ We see the results of the hypothesis test below:
   observed difference is due to random chance.
 - **Alternative Hypothesis:** Explicit tracks are more energetic, on average, than non-explicit
   tracks.
-- **Test statistic:** mean(`energy` | explicit) − mean(`energy` | non-explicit)
+- **Test statistic:** mean(`energy` \| explicit) − mean(`energy` \| non-explicit)
 - **Significance level:** 0.05
 Using a permutation test (10,000 shuffles of the `explicit` label), the observed difference in
 means was **0.092**, and **0 out of 10,000** permuted differences were as extreme, giving a
@@ -241,7 +241,12 @@ the number of estimators controls how stable the ensemble's averaged predictions
  
 **Performance:** Accuracy = `0.9240`, compared to the baseline's `0.8598` — an improvement
 (once evaluated on the same held-out test set).
- 
+
+Below we see a matrix describing the performance of the final model:
+![Confusion Matrix](assets/confusionmatrix.png)
+The low recall and high precision for explicit tracks implies this model is essentially a more refined 
+version of the "guess not explicit every time model", in the sense that it rarely predicts a track to 
+be explicit, but does so when it feels extremely confident.
 ---
  
 ## Fairness Analysis
