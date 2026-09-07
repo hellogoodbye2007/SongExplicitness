@@ -49,7 +49,7 @@ relevant to this analysis are:
   collapsing was appropriate.
 - Replaced sentinel values that don't represent real musical measurements with `NaN`:
   - `key == -1` (Spotify's own "no key detected" code)
-  - `tempo == 0` (a track cannot have 0 BPM — this reflects failed beat detection)
+  - `tempo == 0` (a track cannot have 0 BPM)
   - `time_signature == 0` (not a valid time signature)
 These steps reflect the data generating process: Spotify's audio-feature pipeline algorithmically
 estimates these values, and each sentinel marks a case where that estimation failed rather than a
@@ -58,87 +58,71 @@ true "zero" measurement.
 Cleaned data preview:
  
 ```
-<FILL IN: paste output of music_tracks.head().to_markdown() here>
+| track_id               | artists                | album_name                                             | track_name                 |   popularity |   duration_ms | release_date   | explicit   |   danceability |   energy |   key |   loudness |   mode |   speechiness |   acousticness |   instrumentalness |   liveness |   valence |   tempo |   time_signature | track_genre   |   duration_min |
+|:-----------------------|:-----------------------|:-------------------------------------------------------|:---------------------------|-------------:|--------------:|:---------------|:-----------|---------------:|---------:|------:|-----------:|-------:|--------------:|---------------:|-------------------:|-----------:|----------:|--------:|-----------------:|:--------------|---------------:|
+| 5SuOikwiRyPMVoIQDJUgSV | Gen Hoshino            | Comedy                                                 | Comedy                     |           73 |        230666 | 1974           | False      |          0.676 |   0.461  |     1 |     -6.746 |      0 |        0.143  |         0.0322 |           1.01e-06 |     0.358  |     0.715 |  87.917 |                4 | acoustic      |        3.84443 |
+| 4qPNDBW1i3p13qLCt0Ki3A | Ben Woodward           | Ghost (Acoustic)                                       | Ghost - Acoustic           |           55 |        149610 | 1995-04        | False      |          0.42  |   0.166  |     1 |    -17.235 |      1 |        0.0763 |         0.924  |           5.56e-06 |     0.101  |     0.267 |  77.489 |                4 | acoustic      |        2.4935  |
+| 1iJBSr7s7jYXzM8EGcbK5b | Ingrid Michaelson;ZAYN | To Begin Again                                         | To Begin Again             |           57 |        210826 | 1973           | False      |          0.438 |   0.359  |     0 |     -9.734 |      1 |        0.0557 |         0.21   |           0        |     0.117  |     0.12  |  76.332 |                4 | acoustic      |        3.51377 |
+| 6lfxq3CG4xtTiEg7opyCyx | Kina Grannis           | Crazy Rich Asians (Original Motion Picture Soundtrack) | Can't Help Falling In Love |           71 |        201933 | 2018-08-10     | False      |          0.266 |   0.0596 |     0 |    -18.515 |      1 |        0.0363 |         0.905  |           7.07e-05 |     0.132  |     0.143 | 181.74  |                3 | acoustic      |        3.36555 |
+| 5vjLSffimiIP26QG5WcN2K | Chord Overstreet       | Hold On                                                | Hold On                    |           82 |        198853 | 2017-02-03     | False      |          0.618 |   0.443  |     2 |     -9.681 |      1 |        0.0526 |         0.469  |           0        |     0.0829 |     0.167 | nan     |                4 | acoustic      |        3.31422 |
 ```
  
 ### Univariate Analysis
  
-<!-- Embed your duration_min histogram -->
 <iframe
-  src="assets/duration-distribution.html"
-  width="800"
-  height="600"
-  frameborder="0"
-></iframe>
-Track duration clusters heavily around 3 minutes, as expected for popular music, but with a
-notable long tail — some of the longest tracks turn out to be classical pieces and compilations
-(e.g. multi-movement recordings), which explains the extended right tail beyond typical pop-song
-length.
- 
-<!-- Embed your energy histogram -->
-<iframe
-  src="assets/energy-distribution.html"
+  src="assets/trackenergy.html"
   width="800"
   height="600"
   frameborder="0"
 ></iframe>
 Energy increases fairly steadily across its range rather than peaking at a single typical value,
-suggesting the dataset spans a genuinely wide mix of low-energy (acoustic, classical) and
-high-energy (metal, dance) genres rather than being dominated by one style.
+suggesting the dataset is skewed toward higher-energy songs. This could be an artifact of the
+genres present being mostly those that tend to be high energy.
  
 ### Bivariate Analysis
  
-<!-- Embed your loudness vs energy scatter plot -->
 <iframe
-  src="assets/energy-vs-loudness.html"
-  width="800"
-  height="600"
-  frameborder="0"
-></iframe>
-Energy and loudness show a clear positive relationship, though the shape isn't perfectly linear —
-it curves in a way reminiscent of logistic growth, suggesting the relationship saturates at high
-loudness/energy levels.
- 
-<!-- Embed your percent-explicit-by-energy-bin bar chart -->
-<iframe
-  src="assets/pct-explicit-by-energy.html"
+  src="assets/energyexplicit.html"
   width="800"
   height="600"
   frameborder="0"
 ></iframe>
 The percentage of explicit tracks generally rises with energy, consistent with the hypothesis test
-result below — but the very highest energy bin dips unexpectedly. Investigating further, the
-highest-energy bin is dominated by metal subgenres (grindcore, death-metal, black-metal,
-heavy-metal), which tend to be explicit at a lower rate than genres like hip-hop despite their high
-energy — a reminder that the energy–explicitness relationship isn't uniform across genres.
+result below, but there is a dip when energy reaches around 0.7, perhaps implying that genres
+around that energy level tend to be less explicit. The last column spike could be explain by two 
+factors: either one, the percent is unreliable since as we saw with the energy bins, there is a 
+sudden drop in population size so the percent can fluctuate wildly, or two, it's flooded with a 
+genre that's high-energy and tends to be explicit, such as heavy metal. Analyzing the genres in this
+last bin, we find that 4 out of the 5 are metal subgenres, which would explain the explicitness.
  
 ### Interesting Aggregates
  
 Grouping numeric features by `explicit` status:
  
 ```
-<FILL IN: paste output of the groupby('explicit').mean() table .to_markdown() here>
+|   popularity |   duration_ms |   danceability |   energy |   loudness |     mode |   speechiness |   acousticness |   instrumentalness |   liveness |   valence |   tempo |
+|-------------:|--------------:|---------------:|---------:|-----------:|---------:|--------------:|---------------:|-------------------:|-----------:|----------:|--------:|
+|      32.8526 |        231407 |       0.555717 | 0.62654  |   -8.67348 | 0.641962 |     0.0760494 |       0.337772 |          0.184538  |   0.214503 |  0.469693 | 123.36  |
+|      36.8856 |        205050 |       0.630846 | 0.718776 |   -6.64095 | 0.583853 |     0.20876   |       0.22726  |          0.0549742 |   0.243254 |  0.46715  | 122.047 |
 ```
  
 Explicit tracks average higher energy, danceability, and speechiness, and lower acousticness and
-instrumentalness than non-explicit tracks — consistent with explicit content skewing toward more
+instrumentalness than non-explicit tracks, consistent with explicit content skewing toward more
 produced, vocal-forward, higher-intensity music.
  
 ---
  
 ## Assessment of Missingness
- 
+
+Analyzing missigness, we find only tempo and time signature to be missing values, with around
+19.8% percent of the tracks missing tempo and 0.181% of the tracks missing time signature.
+
 ### MNAR Analysis
  
-I believe **`tempo`** is likely **MNAR** (Missing Not At Random). Tempo is algorithmically
-estimated by Spotify's beat-tracking pipeline, and a value goes missing specifically when that
-algorithm fails to confidently detect a stable beat. That failure is driven by properties of the
-track's *actual rhythmic structure* — e.g. highly ambient, atonal, or non-percussive music is
-both harder to beat-track *and* would have had an unusual/ambiguous true tempo value if it could
-be measured. In other words, the reason the value is missing is tied to the very quantity that's
-missing, which is the defining feature of MNAR. Additional data that could help move this toward
-MAR would be a confidence score from Spotify's beat-tracking algorithm itself, or raw audio access
-to allow independent tempo estimation.
+I believe neither of these to be MNAR. The missingness is likely attributed to ambient noise and
+fluctuations in tempo that make it tough for Spoitfy to algorithmically compute this values,
+which don't necessarily change with respect to the values of tempo or time signature themselves; rather,
+they would change with other features like genre.
  
 ### Missingness Dependency
  
@@ -148,16 +132,16 @@ Total Variation Distance (TVD) as the test statistic for categorical columns.
 - **`tempo` missingness *depends on* `track_genre`**: observed TVD ≈ 0.19, p-value = 0.0. This
   makes sense — some genres (e.g. ambient, spoken-word-heavy genres) are inherently harder for a
   beat-tracker to analyze than others.
-- **`tempo` missingness *does not depend on* `<FILL IN: popularity or explicit — rerun to confirm which>`**:
-  p-value = `<FILL IN>`, indicating no detectable relationship — consistent with this column being
+- **`tempo` missingness *does not depend on* `popularity`**:
+  p-value = `0.946`, indicating no detectable relationship — consistent with this column being
   unrelated to the audio-analysis pipeline that produces tempo estimates.
 I ran the same pair of tests for `time_signature` missingness:
  
-- **Depends on `track_genre`**: observed TVD ≈ 0.46, p-value = 0.0.
-- **Does not depend on `mode`**: p-value = 0.207.
-<!-- Embed a plot related to your missingness exploration -->
+- **Depends on `track_genre`**: observed TVD ≈ 0.46, p-value = 0.0. For likely the same reasons as above.
+- **Does not depend on `mode`**: p-value = 0.207. No reason for a major or minor key to influence missigness of time signature.
+We see the results of the hypothesis test below:
 <iframe
-  src="assets/missingness-plot.html"
+  src="assets/missingpermtest.html"
   width="800"
   height="600"
   frameborder="0"
@@ -202,9 +186,9 @@ explicit in the first place, rather than a universal property of "explicit music
   algorithmically-derived audio features, generated from the track's audio at ingestion — none of
   them depend on post-release information like `popularity`, so there's no risk of leaking
   future/outcome information into the model.
-- **Evaluation metric:** `<FILL IN based on Issue #3 above — recommend explaining you use accuracy
-  but note the class imbalance (~91% not-explicit), and why you also report precision/recall/F1
-  from the classification_report rather than relying on accuracy alone>`
+- **Evaluation metric:**: Accuracy, mainly chose for ease of interpretability; however, it comes with
+  the cost that accuracy will seem high even for a poor model(a model that predicts non-explicit every time
+  would score fairly high), so have to take this into account when analyzing results.
 ---
  
 ## Baseline Model
@@ -217,11 +201,11 @@ ordering; mode is a binary category). `danceability` and `energy` were left as-i
 already bounded, continuous quantitative measures. All steps were implemented in a single
 `sklearn` `Pipeline`.
  
-**Performance:** Accuracy = `<FILL IN after re-running with the corrected, matching test_size — see Issue #1>`
+**Performance:** Accuracy = `0.8598` (accuracy on untrained test data, 20% of the data set aside.)
  
-Whether this is "good": on its own it beats a majority-class baseline (~91.4% not-explicit), but
-only modestly — this simple model has limited signal from just 4 features and doesn't yet use
-several plausibly-relevant columns (loudness, tempo, valence, time signature).
+This is frankly a pathetic model, since it fails to beat a simple algorithm that predicts non-explicit
+every time(which would achieve an accuracy of 0.914), however, it gives us a good baseline to start with.
+It helps us contextualize why we need to take the extra care and steps that we do in the final model.
  
 ---
  
@@ -236,20 +220,26 @@ weakness).
 1. **`time_signature`, one-hot encoded** — even though it's stored numerically, time signature is
    categorical in nature (3/4/5 beats-per-measure aren't meaningfully ordered or additive), so
    encoding it as a category rather than a raw number avoids implying a false numeric relationship.
-2. **`tempo`, median-imputed then quantile-transformed** — tempo has missing values (from failed
-   beat detection, per the MNAR discussion above) that needed imputing, and is right-skewed with
-   some extreme outliers; `QuantileTransformer` maps it to a uniform distribution so extreme tempo
-   values don't disproportionately influence the model.
+2. **`tempo`, median-imputed then quantile-transformed** — tempo has missing values that needed 
+   imputing, and is right-skewed with some extreme outliers; `QuantileTransformer` maps it to a 
+   uniform distribution so extreme tempo values don't disproportionately influence the model.
 `loudness` and `valence` were added as additional plain quantitative features.
  
+These features help us get more context on the music, so we can better address the framing question;
+the goal is to simply feed as much of this information as possible and see if that can create an 
+effective model. We ignore features like instrumentalness or speechiness since these have much more
+obvious correlations with explicitness(a song can't be explicit if it has no words), and as such stray
+away from getting us an answer. These were able to improve the model since they gave a deeper understanding
+of the music behind each track.
+
 **Hyperparameters tuned:** `max_depth`, `n_estimators`, and `min_samples_split`, selected via
 `GridSearchCV` with 5-fold cross-validation. These were chosen because tree depth and minimum
 samples per split most directly control overfitting — a decision tree/forest's key weakness — while
 the number of estimators controls how stable the ensemble's averaged predictions are.
  
-**Best hyperparameters:** `<FILL IN final numbers after fixing Issue #1>`
+**Best hyperparameters:** `max depth of None, number of estimators set to 200, and min samples split set to 2`
  
-**Performance:** Accuracy = `<FILL IN>`, compared to the baseline's `<FILL IN>` — an improvement
+**Performance:** Accuracy = `0.9240`, compared to the baseline's `0.8598` — an improvement
 (once evaluated on the same held-out test set).
  
 ---
@@ -278,4 +268,6 @@ evidence that the model treats hip-hop and dancehall tracks differently in terms
 least by this test. (Note: hip-hop's overall accuracy on this model was notably lower — 0.807 —
 than the model's global accuracy, suggesting that while precision parity holds, the model's
 ability to correctly classify hip-hop tracks overall may still be weaker than for the dataset as a
-whole.)
+whole. However, since the proportion of hip-hop tracks that are explicit is 0.313, a simple model
+predicting not explicit every time would only have an accuracy of 0.687, demonstrating our model's
+advantage over this simple version.)
